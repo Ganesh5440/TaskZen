@@ -34,6 +34,12 @@ public class UserController {
     @PostMapping(value = "register")
     public ResponseEntity<String>createUser(@Valid @RequestParam String username,
                                             @RequestParam String password, @RequestParam String email){
+        if(repository.existsByEmail(email)){
+            return ResponseEntity.badRequest().body("Email Already Exist");
+        }
+        if(repository.existsByUsername(username)){
+            return ResponseEntity.badRequest().body("UserName already Exists");
+        }
         User user=new User();
         user.setUsername(username);
         user.setEmail(email);
