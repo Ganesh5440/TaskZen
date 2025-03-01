@@ -7,10 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -81,5 +78,18 @@ public class ToDOControllerJPA {
         Authentication authentication= SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName();
     }
-
+   @GetMapping(value = "login")
+    public String getLoginPage(){
+        return "login";
+   }
+    @GetMapping("/welcome")
+    public String showWelcomePage(ModelMap model) {
+        String name=getLoggedInUserName();
+        model.addAttribute("name",name);
+        return "welcome";
+    }
+    @GetMapping(value = "register")
+    public String getRegistered(){
+        return "register";
+    }
 }

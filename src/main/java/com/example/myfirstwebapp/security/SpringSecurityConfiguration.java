@@ -15,32 +15,46 @@ import java.net.http.HttpRequest;
 
 @Configuration
 public class SpringSecurityConfiguration {
-    @Bean
-    public InMemoryUserDetailsManager createUserDetailManager(){
-
-        UserDetails userDetails1 = createUser("Ganesh","Ganesh");
-        UserDetails userDetails2 = createUser("user2","Ganesh");
-        return new InMemoryUserDetailsManager(userDetails1,userDetails2);
-    }
-
-    private UserDetails createUser(String Username,String Password) {
-        UserDetails userDetails=User.withUsername(Username)
-                .password(passwordEncoder().encode(Password))
-                .roles("USER","ADMIN")
-                .build();
-        return userDetails;
-    }
+//    @Bean
+//    public InMemoryUserDetailsManager createUserDetailManager(){
+//
+//        UserDetails userDetails1 = createUser("Ganesh","Ganesh");
+//        UserDetails userDetails2 = createUser("user2","Ganesh");
+//        return new InMemoryUserDetailsManager(userDetails1,userDetails2);
+//    }
+//
+//    private UserDetails createUser(String Username,String Password) {
+//        UserDetails userDetails=User.withUsername(Username)
+//                .password(passwordEncoder().encode(Password))
+//                .roles("USER","ADMIN")
+//                .build();
+//        return userDetails;
+//    }
 
     @Bean
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        http.authorizeHttpRequests(auth->auth.anyRequest().authenticated());
-        http.formLogin(Customizer.withDefaults());
-        http.csrf().disable();
-        http.headers().frameOptions().disable();
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/WEB-INF/jsp/**","/hello","/register").permitAll() // Allow access to login and welcome page
+                        .anyRequest().authenticated() // All other pages require authentication
+                )
+                .formLogin(form -> form
+                        .loginPage("/login") // Custom login page
+                        .loginProcessingUrl("/login") // Form action URL
+                        .defaultSuccessUrl("/welcome", true) // Redirect to welcome page after login
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .permitAll()
+                )
+                .csrf(csrf -> csrf.disable()); // Disable CSRF (only if needed)
+
         return http.build();
     }
 }
